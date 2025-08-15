@@ -87,6 +87,14 @@
 			return hours + ':' + minutes;
 		}
 	</script>
+	<script type="text/javascript" th:inline="javascript">
+		window.onload = function check() {
+			const check = /*[[${check}]]*/ "真偽値";
+			if (check) {
+				alert('過去日の勤怠に未入力があります。');
+			}
+		}
+	</script>
 
 </body>
 </html>

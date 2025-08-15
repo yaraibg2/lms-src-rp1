@@ -28,6 +28,7 @@ import jp.co.sss.lms.util.TrainingTime;
  * 
  * @author 東京ITスクール
  */
+
 @Service
 public class StudentAttendanceService {
 
@@ -71,6 +72,23 @@ public class StudentAttendanceService {
 		}
 
 		return attendanceManagementDtoList;
+	}
+	
+	/**
+	 * 未入力があるかどうかを確認
+	 * 
+	 * @param courseId
+	 * @param lmsUserId
+	 * @return 未入力チェック
+	 */
+	public boolean checkAttendanceBlank(Integer lmsUserId) {
+		//未入力数の確認
+		int checked = tStudentAttendanceMapper.notEnterCount(lmsUserId, Constants.DB_FLG_FALSE, new Date());
+		
+		if (checked > 0) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -256,6 +274,38 @@ public class StudentAttendanceService {
 
 		return attendanceForm;
 	}
+	
+	/**
+	 * 勤怠時間の時間設定
+	 * @return 時間
+	 */
+	public List<String> setHours() {
+		List<String> hours = new ArrayList<>();
+		for (int i = 0; i < 24; i++) {
+			if (i < 10) {
+				hours.add("0" + i);
+			} else {
+				hours.add("" + i);
+			}
+		}
+		return hours;
+	}
+	
+	/**
+	 * 勤怠時間の分設定
+	 * @return 分
+	 */
+	public List<String> setMinutes() {
+		List<String> minutes = new ArrayList<>();
+		for (int i = 0; i < 60; i++) {
+			if (i < 10) {
+				minutes.add("0" + i);
+			} else {
+				minutes.add("" + i);
+			}
+		}
+		return minutes;
+	}
 
 	/**
 	 * 勤怠登録・更新処理
@@ -332,6 +382,60 @@ public class StudentAttendanceService {
 		}
 		// 完了メッセージ
 		return messageUtil.getMessage(Constants.PROP_KEY_ATTENDANCE_UPDATE_NOTICE);
+	}
+	
+	/**
+	 * 講義時間を時間と分に分割
+	 * @param forms
+	 * @return 設定後のフォーム
+	 */
+	public List<DailyAttendanceForm> setTimes(List<DailyAttendanceForm> forms) {
+		List<DailyAttendanceForm> newForm = new ArrayList<>();
+		for (DailyAttendanceForm form : forms) {
+			if (form.getTrainingStartTime() != null
+					|| form.getTrainingEndTime() != null) {
+				String startTime = form.getTrainingStartTime();
+				String endTime = form.getTrainingEndTime();
+				
+				if (!startTime.equals("")) {
+					String[] startTimes = startTime.split(":");
+					form.setStartHours(startTimes[0]);
+					form.setStartMinutes(startTimes[1]);
+				}
+				
+				if (!endTime.equals("")) {
+				String[] endTimes = endTime.split(":");
+				form.setEndHours(endTimes[0]);
+				form.setEndMinutes(endTimes[1]);
+				}
+			}
+			newForm.add(form);
+		}
+		return newForm;
+	}
+	
+	/**
+	 * 時間と分の結合
+	 * @param forms
+	 * @return 結合後のフォーム
+	 */
+	public List<DailyAttendanceForm> unionTimes(List<DailyAttendanceForm> forms) {
+		List<DailyAttendanceForm> newForm = new ArrayList<>();
+		for (DailyAttendanceForm form : forms) {
+			if (form.getStartHours() != null
+					&& form.getStartMinutes() != null
+					&& form.getEndHours() != null
+					&& form.getEndMinutes() != null) {
+				form.setTrainingStartTime(form.getStartHours() + ":" + form.getStartMinutes());
+				form.setTrainingEndTime(form.getEndHours() + ":" + form.getEndMinutes());
+			}
+			if (form.getTrainingStartTime().equals("00:00") && form.getTrainingEndTime().equals("00:00")) {
+				form.setTrainingStartTime(null);
+				form.setTrainingEndTime(null);
+			}
+			newForm.add(form);
+		}
+		return newForm;
 	}
 
 }

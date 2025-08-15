@@ -1704,3 +1704,8 @@ html, body {
 	float: left;
 	width: 50%;
 }
+
+.select {
+	display: flex;
+	width: 150px;
+}
