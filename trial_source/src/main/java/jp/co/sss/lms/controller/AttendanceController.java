@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -135,15 +136,30 @@ public class AttendanceController {
 	 * @throws ParseException
 	 */
 	@RequestMapping(path = "/update", params = "complete", method = RequestMethod.POST)
-	public String complete(AttendanceForm attendanceForm, BindingResult result, Model model)
+	public String complete(@Validated AttendanceForm attendanceForm, BindingResult result, Model model)
 			throws ParseException {
 		
 		//時間を結合	
 		attendanceForm.setAttendanceList(studentAttendanceService.unionTimes(attendanceForm.getAttendanceList()));
+		result = studentAttendanceService.punchCheck(attendanceForm, result);
 		
-		// 更新
-		String message = studentAttendanceService.update(attendanceForm);
-		model.addAttribute("message", message);
+		if(attendanceForm.getErrorList() != null) {
+			model.addAttribute("errorList",attendanceForm.getErrorList());
+		}
+		model.addAttribute("errorCount",result.getErrorCount());
+		
+		if (result.hasErrors()) {
+			attendanceForm = studentAttendanceService.setBlankTime(attendanceForm);
+			// 勤怠フォームの生成
+			model.addAttribute("hours", studentAttendanceService.setHours());
+			model.addAttribute("minutes", studentAttendanceService.setMinutes());
+			model.addAttribute("attendanceForm", attendanceForm);
+			return "attendance/update";
+		} else {
+			// 更新
+			String message = studentAttendanceService.update(attendanceForm);
+			model.addAttribute("message", message);
+		}
 		// 一覧の再取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());

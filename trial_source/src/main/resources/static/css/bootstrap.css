@@ -3018,6 +3018,52 @@ fieldset[disabled] .btn {
           box-shadow: none;
   opacity: .65;
 }
+.btn-fixedtime {
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
+}
+.btn-fixedtime:hover,
+.btn-fixedtime:focus,
+.btn-fixedtime.focus,
+.btn-fixedtime:active,
+.btn-fixedtime.active,
+.open > .dropdown-toggle.btn-fixedtime {
+  color: #333;
+  background-color: #e6e6e6;
+  border-color: #adadad;
+}
+.btn-fixedtime:active,
+.btn-fixedtime.active,
+.open > .dropdown-toggle.btn-fixedtime {
+  background-image: none;
+}
+.btn-fixedtime.disabled,
+.btn-fixedtime[disabled],
+fieldset[disabled] .btn-fixedtime,
+.btn-fixedtime.disabled:hover,
+.btn-fixedtime[disabled]:hover,
+fieldset[disabled] .btn-fixedtime:hover,
+.btn-fixedtime.disabled:focus,
+.btn-fixedtime[disabled]:focus,
+fieldset[disabled] .btn-fixedtime:focus,
+.btn-fixedtime.disabled.focus,
+.btn-fixedtime[disabled].focus,
+fieldset[disabled] .btn-fixedtime.focus,
+.btn-fixedtime.disabled:active,
+.btn-fixedtime[disabled]:active,
+fieldset[disabled] .btn-fixedtime:active,
+.btn-fixedtime.disabled.active,
+.btn-fixedtime[disabled].active,
+fieldset[disabled] .btn-fixedtime.active {
+  background-color: #fff;
+  border-color: #ccc;
+}
+.btn-fixedtime .badge {
+  color: #fff;
+  background-color: #333;
+}
+
 .btn-default {
   color: #333;
   background-color: #fff;

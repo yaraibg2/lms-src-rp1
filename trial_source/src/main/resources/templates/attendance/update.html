@@ -1,14 +1,22 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-	th:replace="~{/common/layout :: layout(~{::title},~{::body/content()})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{/common/layout :: layout(~{::title},~{::body/content()})}">
+
 <head>
-<meta charset="UTF-8">
-<title>勤怠情報変更｜LMS</title>
+	<meta charset="UTF-8">
+	<title>勤怠情報変更｜LMS</title>
 </head>
+
 <body>
 
 	<th:block th:if="${session.loginUserDto.role == '0001'}">
 		<h2>勤怠管理</h2>
+	</th:block>
+	
+	<th:block th:if="${errorCount != 0}" id="error">
+		<ul style="padding-left: 0; list-style: none;" th:each="errors :${errorList}">
+			<li th:if="${errors != null}"><span th:text="'*' + '&nbsp' + ${errors}" class="help-inline error"></span>
+			</li>
+		</ul>
 	</th:block>
 
 	<th:block th:if="${session.loginUserDto.role != '0001'}">
@@ -36,52 +44,76 @@
 						</tr>
 					</thead>
 					<tbody>
-						<th:block th:each="dailyAttendanceForm, stat : *{attendanceForm.attendanceList}">
+						<th:block th:each="dailyAttendanceForm, stat : *{attendanceForm.attendanceList}"
+							th:id="${dailyAttendanceForm.trainingDate}">
 							<tr>
 								<th:block>
-									<input type="hidden" th:name="|attendanceList[${stat.index}].isToday|" th:value="${dailyAttendanceForm.isToday}" />
-									<input type="hidden" th:name="|attendanceList[${stat.index}].studentAttendanceId|" th:value="${dailyAttendanceForm.studentAttendanceId}" />
-									<input type="hidden" th:name="|attendanceList[${stat.index}].trainingDate|" th:value="${dailyAttendanceForm.trainingDate}" />
-									<input type="hidden" th:name="|attendanceList[${stat.index}].dispTrainingDate|" th:value="${dailyAttendanceForm.dispTrainingDate}" />
-									<input type="hidden" th:name="|attendanceList[${stat.index}].sectionName|" th:value="${dailyAttendanceForm.sectionName}" />
-									<input type="hidden" th:name="|attendanceList[${stat.index}].statusDispName|" th:value="${dailyAttendanceForm.statusDispName}" />
+									<input type="hidden" th:name="|attendanceList[${stat.index}].isToday|"
+										th:value="${dailyAttendanceForm.isToday}" />
+									<input type="hidden" th:name="|attendanceList[${stat.index}].studentAttendanceId|"
+										th:value="${dailyAttendanceForm.studentAttendanceId}" />
+									<input type="hidden" th:name="|attendanceList[${stat.index}].trainingDate|"
+										th:value="${dailyAttendanceForm.trainingDate}" />
+									<input type="hidden" th:name="|attendanceList[${stat.index}].dispTrainingDate|"
+										th:value="${dailyAttendanceForm.dispTrainingDate}" />
+									<input type="hidden" th:name="|attendanceList[${stat.index}].sectionName|"
+										th:value="${dailyAttendanceForm.sectionName}" />
+									<input type="hidden" th:name="|attendanceList[${stat.index}].statusDispName|"
+										th:value="${dailyAttendanceForm.statusDispName}" />
 								</th:block>
 								<td class="w140">[[${dailyAttendanceForm.dispTrainingDate}]]</td>
 								<td class="w300">[[${dailyAttendanceForm.sectionName}]]</td>
 								<td class="w50">
-									<input class="btn btn-default" type="button" value="定時" onclick="setTimesToFixedTime()"/>
+									<button class="btn btn-default" type="button"
+										th:onclick="setTimesToFixedTime([[${stat.index}]])">定時</button>
 								</td>
 								<td class="w70">
 									<div class="select">
-										<select id="startHour" th:name="|attendanceList[${stat.index}].startHours|" class="form-control">
-											<option th:each="hour : ${hours}" th:value="${hour}" th:text="${hour}" th:selected="${hour} == ${dailyAttendanceForm.startHours}"></option>
+										<select th:id="${'startHours' + stat.index}"
+											th:name="|attendanceList[${stat.index}].startHours|" class="form-control">
+											<option value="0"></option>
+											<option th:each="hour : ${hours}" th:value="${hour}" th:text="${hour}"
+												th:selected="${hour} == ${dailyAttendanceForm.startHours}"></option>
 										</select>
 										：
-										<select id="startMinute" th:name="|attendanceList[${stat.index}].startMinutes|" class="form-control">
-											<option th:each="minute : ${minutes}" th:value="${minute}" th:text="${minute}" th:selected="${minute} == ${dailyAttendanceForm.startMinutes}"></option>
+										<select th:id="${'startMinutes' + stat.index}"
+											th:name="|attendanceList[${stat.index}].startMinutes|" class="form-control">
+											<option value="0"></option>
+											<option th:each="minute : ${minutes}" th:value="${minute}"
+												th:text="${minute}"
+												th:selected="${minute} == ${dailyAttendanceForm.startMinutes}"></option>
 										</select>
 									</div>
 								</td>
 								<td class="w70">
 									<div class="select">
-										<select id="endHour" th:name="|attendanceList[${stat.index}].endHours|" class="form-control">
-											<option th:each="hour : ${hours}" th:value="${hour}" th:text="${hour}" th:selected="${hour} == ${dailyAttendanceForm.endHours}"></option>
+										<select th:id="${'endHours' + stat.index}"
+											th:name="|attendanceList[${stat.index}].endHours|" class="form-control">
+											<option value="0"></option>
+											<option th:each="hour : ${hours}" th:value="${hour}" th:text="${hour}"
+												th:selected="${hour} == ${dailyAttendanceForm.endHours}"></option>
 										</select>
 										：
-										<select id="endMinute" th:name="|attendanceList[${stat.index}].endMinutes|" class="form-control">
-											<option th:each="minute : ${minutes}" th:value="${minute}" th:text="${minute}" th:selected="${minute} == ${dailyAttendanceForm.endMinutes}"></option>
+										<select th:id="${'endMinutes' + stat.index}" th:name="|attendanceList[${stat.index}].endMinutes|"
+											class="form-control">
+											<option value="0"></option>
+											<option th:each="minute : ${minutes}" th:value="${minute}" th:text="${minute}"
+												th:selected="${minute} == ${dailyAttendanceForm.endMinutes}"></option>
 										</select>
 									</div>
 								</td>
 								<td class="w80">
 									<select th:name="|attendanceList[${stat.index}].blankTime|" class="form-control">
-										<option th:each="blankTime : ${attendanceForm.blankTimes}" th:value="${blankTime.key}" th:inlne="text" class="form-control" 
-											th:selected="${blankTime.key == dailyAttendanceForm.blankTime}">[[${blankTime.value}]]</option>
+										<option th:each="blankTime : ${attendanceForm.blankTimes}"
+											th:value="${blankTime.key}" th:inlne="text" class="form-control"
+											th:selected="${blankTime.key == dailyAttendanceForm.blankTime}">
+											[[${blankTime.value}]]</option>
 									</select>
 								</td>
 								<td class="w70">[[${dailyAttendanceForm.statusDispName}]]</td>
 								<td class="w240">
-									<input type="text" th:name="|attendanceList[${stat.index}].note|" th:value="${dailyAttendanceForm.note}" class="form-control"></input>
+									<input type="text" th:name="|attendanceList[${stat.index}].note|"
+										th:value="${dailyAttendanceForm.note}" class="form-control"></input>
 								</td>
 							</tr>
 						</th:block>
@@ -97,23 +129,24 @@
 					</th:block>
 					<input type="submit" value="更新" name="complete" class="btn btn-info" />
 				</div>
-				
+
 				<script type="text/javascript" th:inline="javascript">
-					function setTimesToFixedTime() {
-						const startHour = document.getElementById("startHour");
+					function setTimesToFixedTime(index) {
+						const trainingIndex = index;
+						const startHour = document.getElementById("startHours" + trainingIndex);
 						startHour.value = "09";
-						const startMinute = document.getElementById("startMinute");
+						const startMinute = document.getElementById("startMinutes" + trainingIndex);
 						startMinute.value = "00";
-						const endHour = document.getElementById("startMinute");
+						const endHour = document.getElementById("endHours" + trainingIndex);
 						endHour.value = "18";
-						const endMinute = document.getElementById("endMinute");
+						const endMinute = document.getElementById("endMinutes" + trainingIndex);
 						endMinute.value = "00";
 					}
 				</script>
-
 			</form>
 		</div>
 	</div>
 
 </body>
+
 </html>
