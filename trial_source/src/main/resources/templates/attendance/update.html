@@ -26,12 +26,12 @@
 		</th:block>
 	</th:block>
 
-	<div class="row">
-		<div class="bs-component col-sm-12">
+	<div class="row" >
+		<div class="bs-component col-sm-12" style="overflow-y: auto; height: 625px;">
 
-			<form th:action="@{/attendance/update}" method="post">
+			<form th:action="@{/attendance/update}" method="post" th:object="${attendanceForm}" onsubmit="return checkDialog(this)">
 				<table class="table table-hover dataTable no-footer">
-					<thead>
+					<thead style="position: sticky; top:0; background: white;">
 						<tr>
 							<th class="w140">日付</th>
 							<th class="w300">コース内容</th>
@@ -44,7 +44,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<th:block th:each="dailyAttendanceForm, stat : *{attendanceForm.attendanceList}"
+						<th:block th:each="dailyAttendanceForm, stat : *{attendanceList}"
 							th:id="${dailyAttendanceForm.trainingDate}">
 							<tr>
 								<th:block>
@@ -64,20 +64,20 @@
 								<td class="w140">[[${dailyAttendanceForm.dispTrainingDate}]]</td>
 								<td class="w300">[[${dailyAttendanceForm.sectionName}]]</td>
 								<td class="w50">
-									<button class="btn btn-default" type="button"
+									<button class="btn btn-success" type="button"
 										th:onclick="setTimesToFixedTime([[${stat.index}]])">定時</button>
 								</td>
 								<td class="w70">
 									<div class="select">
 										<select th:id="${'startHours' + stat.index}"
-											th:name="|attendanceList[${stat.index}].startHours|" class="form-control">
+											th:name="|attendanceList[${stat.index}].startHours|" class="form-control" th:errorclass="errorInput">
 											<option value="0"></option>
 											<option th:each="hour : ${hours}" th:value="${hour}" th:text="${hour}"
 												th:selected="${hour} == ${dailyAttendanceForm.startHours}"></option>
 										</select>
 										：
 										<select th:id="${'startMinutes' + stat.index}"
-											th:name="|attendanceList[${stat.index}].startMinutes|" class="form-control">
+											th:name="|attendanceList[${stat.index}].startMinutes|" class="form-control" th:errorclass="errorInput">
 											<option value="0"></option>
 											<option th:each="minute : ${minutes}" th:value="${minute}"
 												th:text="${minute}"
@@ -88,14 +88,14 @@
 								<td class="w70">
 									<div class="select">
 										<select th:id="${'endHours' + stat.index}"
-											th:name="|attendanceList[${stat.index}].endHours|" class="form-control">
+											th:name="|attendanceList[${stat.index}].endHours|" class="form-control" th:errorclass="errorInput">
 											<option value="0"></option>
 											<option th:each="hour : ${hours}" th:value="${hour}" th:text="${hour}"
 												th:selected="${hour} == ${dailyAttendanceForm.endHours}"></option>
 										</select>
 										：
 										<select th:id="${'endMinutes' + stat.index}" th:name="|attendanceList[${stat.index}].endMinutes|"
-											class="form-control">
+											class="form-control" th:errorclass="errorInput">
 											<option value="0"></option>
 											<option th:each="minute : ${minutes}" th:value="${minute}" th:text="${minute}"
 												th:selected="${minute} == ${dailyAttendanceForm.endMinutes}"></option>
@@ -113,7 +113,7 @@
 								<td class="w70">[[${dailyAttendanceForm.statusDispName}]]</td>
 								<td class="w240">
 									<input type="text" th:name="|attendanceList[${stat.index}].note|"
-										th:value="${dailyAttendanceForm.note}" class="form-control"></input>
+										th:value="${dailyAttendanceForm.note}" class="form-control" th:errorclass="errorInput"></input>
 								</td>
 							</tr>
 						</th:block>
@@ -141,6 +141,16 @@
 						endHour.value = "18";
 						const endMinute = document.getElementById("endMinutes" + trainingIndex);
 						endMinute.value = "00";
+					}
+				</script>
+				<script type="text/javascript" th:inline="javascript">
+					function checkDialog(form) {
+						check = window.confirm("更新します。よろしいですか？");
+						if (check) {
+							return true;
+						} else {
+							return false;
+						}
 					}
 				</script>
 			</form>
