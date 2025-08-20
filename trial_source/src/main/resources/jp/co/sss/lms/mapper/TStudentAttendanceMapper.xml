@@ -86,7 +86,7 @@
 		WHERE student_attendance_id = #{studentAttendanceId}
 	</update>
 	
-	<select id="notEnterCount" parameterType="jp.co.sss.lms.entity.TStudentAttendance">
+	<select id="notEnterCount" resultType="Integer">
 		SELECT COUNT(*) 
 		FROM t_student_attendance
 		WHERE lms_user_id = #{lmsUserId} 
@@ -95,5 +95,16 @@
 			AND status != 1
 			AND (training_start_time = '' OR training_end_time = '' OR training_start_time IS NULL OR training_end_time IS NULL)
 	</select>
+	
+<!--	<select id="courseIdAndPlaceId" resultType="jp.co.sss.lms.entity.AttendanceCheck">-->
+<!--		SELECT-->
+<!--			t2.userId,-->
+<!--			t2.userName,-->
+<!--			t3.courseName,-->
+<!--			t4.companyName,-->
+<!--			t5.placeName-->
+<!--		FROM-->
+<!--			m_user t2 INNER-->
+<!--	</select>-->
 
 </mapper>

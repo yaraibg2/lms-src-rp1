@@ -41,5 +41,9 @@
 		WHERE course_id = #{courseId}
 			AND delete_flg = 0
 	</select>
+	
+	<select id="findAll" resultType="jp.co.sss.lms.entity.MCourse">
+		SELECT * FROM m_course
+	</select>
 
 </mapper>

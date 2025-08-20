@@ -1,9 +1,12 @@
 package jp.co.sss.lms.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import jp.co.sss.lms.dto.CourseServiceCourseDto;
+import jp.co.sss.lms.entity.MCourse;
 
 /**
  * コースマスタマッパー
@@ -31,5 +34,11 @@ public interface MCourseMapper {
 	 * @return コース数
 	 */
 	Integer getCourseCount(Integer courseId);
+	
+	/**
+	 * 全件検索
+	 * @return 全てのコース
+	 */
+	List<MCourse> findAll();
 
 }

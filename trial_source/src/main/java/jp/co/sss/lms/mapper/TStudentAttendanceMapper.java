@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import jp.co.sss.lms.dto.AttendanceManagementDto;
+import jp.co.sss.lms.entity.AttendanceCheck;
 import jp.co.sss.lms.entity.TStudentAttendance;
 
 /**
@@ -65,6 +66,15 @@ public interface TStudentAttendanceMapper {
 	 */
 	Boolean update(TStudentAttendance tStudentAttendance);
 	
+	/**
+	 * 過去日未入力件数を検索
+	 * @param lmsUserId
+	 * @param deleteFlg
+	 * @param trainingDate
+	 * @return 未入力件数
+	 */
 	Integer notEnterCount(@Param("lmsUserId") Integer lmsUserId,
 			@Param("deleteFlg") Short deleteFlg, @Param("trainingDate") Date trainingDate);
+	
+	List<AttendanceCheck> courseIdAndPlaceId(@Param("courseId") Integer courseId, @Param("placeId") Integer placeId);
 }

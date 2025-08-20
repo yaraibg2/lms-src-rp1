@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
 import jp.co.sss.lms.form.AttendanceForm;
+import jp.co.sss.lms.mapper.MCompanyMapper;
+import jp.co.sss.lms.mapper.MCourseMapper;
+import jp.co.sss.lms.mapper.MPlaceMapper;
 import jp.co.sss.lms.service.StudentAttendanceService;
 import jp.co.sss.lms.util.Constants;
 
@@ -30,6 +34,12 @@ public class AttendanceController {
 	private StudentAttendanceService studentAttendanceService;
 	@Autowired
 	private LoginUserDto loginUserDto;
+	@Autowired
+	private MCourseMapper mCourseMapper;
+	@Autowired
+	private MPlaceMapper mPlaceMapper;
+	@Autowired
+	private MCompanyMapper mCompanyMapper;
 
 	/**
 	 * 勤怠管理画面 初期表示
@@ -166,5 +176,12 @@ public class AttendanceController {
 
 		return "attendance/detail";
 	}
-
+	
+	@GetMapping("/list")
+	public String list(Model model) {
+		model.addAttribute("courses", mCourseMapper.findAll());
+		model.addAttribute("places", mPlaceMapper.findAll());
+		model.addAttribute("companies", mCompanyMapper.findAll());
+		return "attendance/list";
+	}
 }
