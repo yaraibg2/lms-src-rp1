@@ -47,6 +47,7 @@ public class AttendanceController {
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
 		model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
+		//過去日に未入力日があるかをチェック
 		boolean check = studentAttendanceService.checkAttendanceBlank(loginUserDto.getLmsUserId());
 		model.addAttribute("check", check);
 
@@ -118,6 +119,7 @@ public class AttendanceController {
 		// 勤怠フォームの生成
 		AttendanceForm attendanceForm = studentAttendanceService
 				.setAttendanceForm(attendanceManagementDtoList);
+		//出勤時刻、退勤時刻を時間と分に分割
 		attendanceForm.setAttendanceList(studentAttendanceService.setTimes(attendanceForm.getAttendanceList()));
 		model.addAttribute("hours", studentAttendanceService.setHours());
 		model.addAttribute("minutes", studentAttendanceService.setMinutes());
@@ -141,19 +143,15 @@ public class AttendanceController {
 		
 		//時間を結合	
 		attendanceForm.setAttendanceList(studentAttendanceService.unionTimes(attendanceForm.getAttendanceList()));
+		//入力チェック
 		result = studentAttendanceService.punchCheck(attendanceForm, result);
-		
-		if(attendanceForm.getErrorList() != null) {
-			model.addAttribute("errorList",attendanceForm.getErrorList());
-		}
-		model.addAttribute("errorCount",result.getErrorCount());
-		
+		//エラーがある場合
 		if (result.hasErrors()) {
+			//中抜け時間を設定
 			attendanceForm = studentAttendanceService.setBlankTime(attendanceForm);
 			// 勤怠フォームの生成
 			model.addAttribute("hours", studentAttendanceService.setHours());
 			model.addAttribute("minutes", studentAttendanceService.setMinutes());
-//			model.addAttribute("org.springframework.validation.BindingResult.attendanceForm", result);
 			model.addAttribute("attendanceForm", attendanceForm);
 			return "attendance/update";
 		} else {

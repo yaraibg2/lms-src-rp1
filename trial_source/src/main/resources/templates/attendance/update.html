@@ -11,13 +11,6 @@
 	<th:block th:if="${session.loginUserDto.role == '0001'}">
 		<h2>勤怠管理</h2>
 	</th:block>
-	
-	<th:block th:if="${errorCount != 0}" id="error">
-		<ul style="padding-left: 0; list-style: none;" th:each="errors :${errorList}">
-			<li th:if="${errors != null}"><span th:text="'*' + '&nbsp' + ${errors}" class="help-inline error"></span>
-			</li>
-		</ul>
-	</th:block>
 
 	<th:block th:if="${session.loginUserDto.role != '0001'}">
 		<h2>勤怠管理 <small>( [[${attendanceForm.userName}]] )</small></h2>
@@ -26,10 +19,16 @@
 		</th:block>
 	</th:block>
 
-	<div class="row" >
+	<div class="row">
 		<div class="bs-component col-sm-12" style="overflow-y: auto; height: 625px;">
 
-			<form th:action="@{/attendance/update}" method="post" th:object="${attendanceForm}" onsubmit="return checkDialog(this)">
+			<form th:action="@{/attendance/update}" method="post" th:object="${attendanceForm}"
+				onsubmit="return checkDialog(this)">
+				<ul style="padding-left: 0; list-style: none;">
+					<li th:each="error:${#fields.detailedErrors()}">
+						<span th:text="'*' + '&nbsp' + ${error.message}" class="help-inline error"></span>
+					</li>
+				</ul>
 				<table class="table table-hover dataTable no-footer">
 					<thead style="position: sticky; top:0; background: white;">
 						<tr>
@@ -70,14 +69,16 @@
 								<td class="w70">
 									<div class="select">
 										<select th:id="${'startHours' + stat.index}"
-											th:name="|attendanceList[${stat.index}].startHours|" class="form-control" th:errorclass="errorInput">
+											th:name="|attendanceList[${stat.index}].startHours|" class="form-control"
+											th:errorclass="errorInput">
 											<option value="0"></option>
 											<option th:each="hour : ${hours}" th:value="${hour}" th:text="${hour}"
 												th:selected="${hour} == ${dailyAttendanceForm.startHours}"></option>
 										</select>
 										：
 										<select th:id="${'startMinutes' + stat.index}"
-											th:name="|attendanceList[${stat.index}].startMinutes|" class="form-control" th:errorclass="errorInput">
+											th:name="|attendanceList[${stat.index}].startMinutes|" class="form-control"
+											th:errorclass="errorInput">
 											<option value="0"></option>
 											<option th:each="minute : ${minutes}" th:value="${minute}"
 												th:text="${minute}"
@@ -88,22 +89,25 @@
 								<td class="w70">
 									<div class="select">
 										<select th:id="${'endHours' + stat.index}"
-											th:name="|attendanceList[${stat.index}].endHours|" class="form-control" th:errorclass="errorInput">
+											th:name="|attendanceList[${stat.index}].endHours|" class="form-control"
+											th:errorclass="errorInput">
 											<option value="0"></option>
 											<option th:each="hour : ${hours}" th:value="${hour}" th:text="${hour}"
 												th:selected="${hour} == ${dailyAttendanceForm.endHours}"></option>
 										</select>
 										：
-										<select th:id="${'endMinutes' + stat.index}" th:name="|attendanceList[${stat.index}].endMinutes|"
-											class="form-control" th:errorclass="errorInput">
+										<select th:id="${'endMinutes' + stat.index}"
+											th:name="|attendanceList[${stat.index}].endMinutes|" class="form-control"
+											th:errorclass="errorInput">
 											<option value="0"></option>
-											<option th:each="minute : ${minutes}" th:value="${minute}" th:text="${minute}"
+											<option th:each="minute : ${minutes}" th:value="${minute}"
+												th:text="${minute}"
 												th:selected="${minute} == ${dailyAttendanceForm.endMinutes}"></option>
 										</select>
 									</div>
 								</td>
 								<td class="w80">
-									<select th:name="|attendanceList[${stat.index}].blankTime|" class="form-control">
+									<select th:name="|attendanceList[${stat.index}].blankTime|" class="form-control" th:errorclass="errorInput">
 										<option th:each="blankTime : ${attendanceForm.blankTimes}"
 											th:value="${blankTime.key}" th:inlne="text" class="form-control"
 											th:selected="${blankTime.key == dailyAttendanceForm.blankTime}">
@@ -113,7 +117,8 @@
 								<td class="w70">[[${dailyAttendanceForm.statusDispName}]]</td>
 								<td class="w240">
 									<input type="text" th:name="|attendanceList[${stat.index}].note|"
-										th:value="${dailyAttendanceForm.note}" class="form-control" th:errorclass="errorInput"></input>
+										th:value="${dailyAttendanceForm.note}" class="form-control"
+										th:errorclass="errorInput"></input>
 								</td>
 							</tr>
 						</th:block>
