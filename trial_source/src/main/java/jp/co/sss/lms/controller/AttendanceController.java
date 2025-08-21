@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import jakarta.servlet.http.HttpSession;
 import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
 import jp.co.sss.lms.entity.AttendanceCheck;
@@ -181,18 +180,29 @@ public class AttendanceController {
 		return "attendance/detail";
 	}
 	
+	/**
+	 * 講師権限ヘッダー 『勤怠確認』リンク押下　
+	 * @param attendanceCheckForm
+	 * @param model
+	 * @return 勤怠情報確認リスト画面
+	 */
 	@GetMapping("/list")
-	public String getList(@ModelAttribute AttendanceCheckForm attendanceCheckForm, Model model) {
+	public String getList(@ModelAttribute AttendanceCheckForm attendanceCheckForm, Model model) {		//それぞれのリストを取得
 		model.addAttribute("courses", mCourseMapper.findAll());
 		model.addAttribute("places", mPlaceMapper.findAll());
 		model.addAttribute("companies", mCompanyMapper.findAll());
 		return "attendance/list";
 	}
-	
+	/**
+	 * 勤怠情報確認リスト画面 『検索』ボタン押下　
+	 * @param attendanceCheckForm
+	 * @param model
+	 * @return 勤怠情報確認リスト画面
+	 */
 	@PostMapping("/list")
 	public String postList(AttendanceCheckForm attendanceCheckForm, Model model) {
 		List<AttendanceCheck> checkList = studentAttendanceService.getAttendanceData(attendanceCheckForm);
-		
+		//それぞれのリストを取得
 		model.addAttribute("checkList", checkList);
 		model.addAttribute("courses", mCourseMapper.findAll());
 		model.addAttribute("places", mPlaceMapper.findAll());
