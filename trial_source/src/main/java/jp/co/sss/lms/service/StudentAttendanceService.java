@@ -15,8 +15,10 @@ import org.springframework.validation.FieldError;
 
 import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
+import jp.co.sss.lms.entity.AttendanceCheck;
 import jp.co.sss.lms.entity.TStudentAttendance;
 import jp.co.sss.lms.enums.AttendanceStatusEnum;
+import jp.co.sss.lms.form.AttendanceCheckForm;
 import jp.co.sss.lms.form.AttendanceForm;
 import jp.co.sss.lms.form.DailyAttendanceForm;
 import jp.co.sss.lms.mapper.TStudentAttendanceMapper;
@@ -580,5 +582,18 @@ public class StudentAttendanceService {
 		forms.setBlankTimes(attendanceUtil.setBlankTime());
 		forms.setAttendanceList(newForm);
 		return forms;
+	}
+	
+	/**
+	 * 勤怠リストを検索
+	 * @param form
+	 * @return 勤怠リスト
+	 */
+	public List<AttendanceCheck> getAttendanceData(AttendanceCheckForm form) {
+		List<AttendanceCheck> check = tStudentAttendanceMapper.findForAttendanceCheck(form.getUserName(), 
+				form.getCourseId(), form.getCompanyId(), form.getPlaceId(), 
+				Constants.CODE_VAL_ROLL_STUDENT, Constants.DB_FLG_FALSE);
+			
+		return check;
 	}
 }

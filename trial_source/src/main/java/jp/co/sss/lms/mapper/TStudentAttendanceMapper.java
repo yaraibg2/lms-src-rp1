@@ -76,5 +76,17 @@ public interface TStudentAttendanceMapper {
 	Integer notEnterCount(@Param("lmsUserId") Integer lmsUserId,
 			@Param("deleteFlg") Short deleteFlg, @Param("trainingDate") Date trainingDate);
 	
-	List<AttendanceCheck> courseIdAndPlaceId(@Param("courseId") Integer courseId, @Param("placeId") Integer placeId);
+	/**
+	 * 勤怠情報確認画面の検索結果
+	 * @param userName
+	 * @param courseId
+	 * @param companyId
+	 * @param placeId
+	 * @param role
+	 * @param deleteFlg
+	 * @return List<AttendanceCheck>
+	 */
+	List<AttendanceCheck> findForAttendanceCheck(@Param("userName") String userName, 
+			@Param("courseId") Integer courseId, @Param("companyId") Integer companyId, 
+			@Param("placeId") Integer placeId, @Param("role") String role, @Param("deleteFlg") Short deleteFlg);
 }

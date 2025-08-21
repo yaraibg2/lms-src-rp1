@@ -96,15 +96,36 @@
 			AND (training_start_time = '' OR training_end_time = '' OR training_start_time IS NULL OR training_end_time IS NULL)
 	</select>
 	
-<!--	<select id="courseIdAndPlaceId" resultType="jp.co.sss.lms.entity.AttendanceCheck">-->
-<!--		SELECT-->
-<!--			t2.userId,-->
-<!--			t2.userName,-->
-<!--			t3.courseName,-->
-<!--			t4.companyName,-->
-<!--			t5.placeName-->
-<!--		FROM-->
-<!--			m_user t2 INNER-->
-<!--	</select>-->
+	<select id="findForAttendanceCheck" resultType="jp.co.sss.lms.entity.AttendanceCheck">
+		SELECT
+			t1.user_id,
+			t2.user_name,
+			t4.course_name,
+			t6.company_name,
+			t8.place_name
+		FROM m_lms_user t1
+			INNER JOIN m_user t2 ON t1.user_id = t2.user_id AND t2.delete_flg = #{deleteFlg}
+			LEFT OUTER JOIN t_course_user t3 ON t1.lms_user_id = t3.lms_user_id AND t3.delete_flg = #{deleteFlg}
+			LEFT OUTER JOIN m_course t4 ON t4.course_id = t3.course_id AND t4.delete_flg = #{deleteFlg}
+			LEFT OUTER JOIN t_user_company t5 ON t1.lms_user_id = t5.lms_user_id AND t5.delete_flg = #{deleteFlg}
+			LEFT OUTER JOIN m_company t6 ON t6.company_id = t5.company_id AND t6.delete_flg = #{deleteFlg}
+			LEFT OUTER JOIN t_user_place t7 ON t1.lms_user_id = t7.lms_user_id AND t7.delete_flg = #{deleteFlg}
+			LEFT OUTER JOIN m_place t8 ON t7.place_id = t8.place_id AND t8.delete_flg = #{deleteFlg}
+		WHERE
+			t2.authority = #{role}
+			AND t2.delete_flg = #{deleteFlg}
+		<if test="userName != null and userName != ''">
+			AND t2.user_name LIKE CONCAT('%',#{userName},'%')
+		</if>
+		<if test="courseId != null">
+			AND t4.course_id = #{courseId}
+		</if>
+		<if test="companyId != null">
+			AND t6.company_id = #{companyId}
+		</if>
+		<if test="placeId != null">
+			AND t8.place_id = #{placeId}
+		</if>
+	</select>
 
 </mapper>
