@@ -133,6 +133,83 @@ public class AttendanceUtil {
 	}
 
 	/**
+	 * 勤怠時間の時間設定
+	 * @return 時間
+	 */
+	public LinkedHashMap<Integer, String> getHourMap() {
+		LinkedHashMap<Integer, String> map = new LinkedHashMap<>();
+		map.put(null, "");
+		String time;
+		//00～23までの値を登録
+		for (int i = 0; i < 24; i++) {
+			if (i < 10) {
+				time = ("0" + i);
+			} else {
+				time = ("" + i);
+			}
+			map.put(i, time);
+		}
+		return map;
+	}
+	
+	/**
+	 * 勤怠時間の分設定
+	 * @return 分
+	 */
+	public LinkedHashMap<Integer, String> getMinuteMap() {
+		LinkedHashMap<Integer, String> map = new LinkedHashMap<>();
+		map.put(null, "");
+		String time;
+		//00～59までの値を登録
+		for (int i = 0; i < 60; i++) {
+			if (i < 10) {
+				time = ("0" + i);
+			} else {
+				time = ("" + i);
+			}
+			map.put(i, time);
+		}
+		return map;
+	}
+	
+	/**
+	 * 受講時間数を算出
+	 * @param time
+	 * @return 受講時間数
+	 */
+	public TrainingTime calcJukoTime(TrainingTime time) {
+		int hour ;
+		int minute ;
+		int trainingMinute = 0;
+		Integer startHour = null;
+		Integer startMinute = null;
+		Integer endHour = null;
+		Integer endMinute = null;
+		
+		if (time.getTrainingStartTime() != null && time.getTrainingEndTime() != null) {
+			String startTime = time.getTrainingStartTime();
+			String endTime = time.getTrainingEndTime();
+			if (!startTime.equals("") && !endTime.equals("")) {
+				//空文字じゃなければ「：」を中心に分割して出勤時間、分をセット
+				String[] startTimes = startTime.split(":");
+				startHour = Integer.parseInt(startTimes[0]);
+				startMinute = Integer.parseInt(startTimes[1]);
+				//空文字じゃなければ「：」を中心に分割して退勤時間、分をセット
+				String[] endTimes = endTime.split(":");
+				endHour = Integer.parseInt(endTimes[0]);
+				endMinute = Integer.parseInt(endTimes[1]);
+				
+				hour = (endHour - startHour) * 60;
+				minute = endMinute - startMinute;
+				trainingMinute = hour + minute;
+				
+				time.setTrainingTime(trainingMinute);
+			}
+		}
+		return time;
+	}
+	
+	/**
 	 * 研修日の判定
 	 * 
 	 * @param courseId

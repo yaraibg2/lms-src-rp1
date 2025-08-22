@@ -134,8 +134,6 @@ public class AttendanceController {
 				.setAttendanceForm(attendanceManagementDtoList);
 		//出勤時刻、退勤時刻を時間と分に分割
 		attendanceForm.setAttendanceList(studentAttendanceService.setTimes(attendanceForm.getAttendanceList()));
-		model.addAttribute("hours", studentAttendanceService.setHours());
-		model.addAttribute("minutes", studentAttendanceService.setMinutes());
 		model.addAttribute("attendanceForm", attendanceForm);
 
 		return "attendance/update";
@@ -160,11 +158,9 @@ public class AttendanceController {
 		result = studentAttendanceService.punchCheck(attendanceForm, result);
 		//エラーがある場合
 		if (result.hasErrors()) {
-			//中抜け時間を設定
-			attendanceForm = studentAttendanceService.setBlankTime(attendanceForm);
+			//中抜け時間と勤怠情報を設定
+			attendanceForm = studentAttendanceService.setTime(attendanceForm);
 			// 勤怠フォームの生成
-			model.addAttribute("hours", studentAttendanceService.setHours());
-			model.addAttribute("minutes", studentAttendanceService.setMinutes());
 			model.addAttribute("attendanceForm", attendanceForm);
 			return "attendance/update";
 		} else {

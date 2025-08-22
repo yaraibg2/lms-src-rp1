@@ -27,6 +27,12 @@ public class TrainingTime implements Comparable<TrainingTime>, Serializable {
 	private Integer hour;
 	/** 分 */
 	private Integer minute;
+	/** 開始時刻 */
+	private String trainingStartTime;
+	/** 終了時刻 */
+	private String trainingEndTime;
+	/** 受講時間数 */
+	private Integer trainingTime;
 
 	/**
 	 * 現在時刻でインスタンスを作成する
