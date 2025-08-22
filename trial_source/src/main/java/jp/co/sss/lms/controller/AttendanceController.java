@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpSession;
 import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
 import jp.co.sss.lms.entity.AttendanceCheck;
+import jp.co.sss.lms.entity.MPlace;
 import jp.co.sss.lms.form.AttendanceCheckForm;
 import jp.co.sss.lms.form.AttendanceForm;
 import jp.co.sss.lms.mapper.MCompanyMapper;
@@ -162,6 +164,8 @@ public class AttendanceController {
 			attendanceForm = studentAttendanceService.setTime(attendanceForm);
 			// 勤怠フォームの生成
 			model.addAttribute("attendanceForm", attendanceForm);
+			//エラーリストを渡す(重複を消すため)
+			model.addAttribute("errorList", attendanceForm.getErrorList());
 			return "attendance/update";
 		} else {
 			// 更新
@@ -184,9 +188,9 @@ public class AttendanceController {
 	 */
 	@GetMapping("/list")
 	public String getList(@ModelAttribute AttendanceCheckForm attendanceCheckForm, Model model) {		//それぞれのリストを取得
-		model.addAttribute("courses", mCourseMapper.findAll());
-		model.addAttribute("places", mPlaceMapper.findAll());
-		model.addAttribute("companies", mCompanyMapper.findAll());
+		model.addAttribute("courses", mCourseMapper.findAll(Constants.DB_FLG_FALSE));
+		model.addAttribute("places", mPlaceMapper.findAll(Constants.DB_FLG_FALSE));
+		model.addAttribute("companies", mCompanyMapper.findAll(Constants.DB_FLG_FALSE));
 		return "attendance/list";
 	}
 	/**
@@ -200,10 +204,20 @@ public class AttendanceController {
 		List<AttendanceCheck> checkList = studentAttendanceService.getAttendanceData(attendanceCheckForm);
 		//それぞれのリストを取得
 		model.addAttribute("checkList", checkList);
-		model.addAttribute("courses", mCourseMapper.findAll());
-		model.addAttribute("places", mPlaceMapper.findAll());
-		model.addAttribute("companies", mCompanyMapper.findAll());
+		model.addAttribute("courses", mCourseMapper.findAll(Constants.DB_FLG_FALSE));
+		model.addAttribute("places", mPlaceMapper.findAll(Constants.DB_FLG_FALSE));
+		model.addAttribute("companies", mCompanyMapper.findAll(Constants.DB_FLG_FALSE));
 		model.addAttribute("attendanceCheckForm", attendanceCheckForm);
 		return "attendance/list";
+	}
+	
+	@GetMapping("/bulkRegist")
+	public String bulkRegist(Model model, HttpSession session) {
+		LoginUserDto dto = (LoginUserDto) session.getAttribute("loginUserDto");	
+		MPlace place = mPlaceMapper.findById(dto.getPlaceId(), Constants.DB_HIDDEN_FLG_FALSE,
+				Constants.DB_FLG_FALSE);
+		String placeName = studentAttendanceService.setPlaceName(place);
+		model.addAttribute("placeName", placeName);
+		return "attendance/bulkRegist";
 	}
 }

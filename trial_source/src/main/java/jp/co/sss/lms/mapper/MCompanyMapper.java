@@ -16,5 +16,5 @@ public interface MCompanyMapper {
 	 * 全件検索
 	 * @return
 	 */
-	List<MCompany> findAll();
+	List<MCompany> findAll(Short deleteFlg);
 }

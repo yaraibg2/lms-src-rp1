@@ -43,7 +43,7 @@
 	</select>
 	
 	<select id="findAll" resultType="jp.co.sss.lms.entity.MCourse">
-		SELECT * FROM m_course
+		SELECT * FROM m_course WHERE delete_flg = #{deleteFlg}
 	</select>
 
 </mapper>

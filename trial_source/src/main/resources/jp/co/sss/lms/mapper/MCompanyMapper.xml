@@ -3,6 +3,6 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="jp.co.sss.lms.mapper.MCompanyMapper">
 	<select id="findAll" resultType="jp.co.sss.lms.entity.MCompany">
-		SELECT * FROM m_company
+		SELECT * FROM m_company WHERE delete_flg = #{deleteFlg}
 	</select>
 </mapper>

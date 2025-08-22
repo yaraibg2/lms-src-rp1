@@ -39,6 +39,6 @@ public interface MCourseMapper {
 	 * 全件検索
 	 * @return 全てのコース
 	 */
-	List<MCourse> findAll();
+	List<MCourse> findAll(Short deleteFlg);
 
 }

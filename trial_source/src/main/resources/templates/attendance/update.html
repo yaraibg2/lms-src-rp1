@@ -24,9 +24,9 @@
 
 			<form th:action="@{/attendance/update}" method="post" th:object="${attendanceForm}"
 				onsubmit="return checkDialog(this)">
-				<ul style="padding-left: 0; list-style: none;">
-					<li th:each="error:${#fields.detailedErrors()}">
-						<span th:text="'*' + '&nbsp' + ${error.message}" class="help-inline error"></span>
+				<ul style="padding-left: 0; list-style: none;" th:if="${errorList != null}">
+					<li th:each="error : ${errorList}">
+						<span th:text="'*' + '&nbsp' + ${error}" class="help-inline error"></span>
 					</li>
 				</ul>
 				<table class="table table-hover dataTable no-footer">

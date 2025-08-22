@@ -1,8 +1,10 @@
 package jp.co.sss.lms.service;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -16,6 +18,7 @@ import org.springframework.validation.FieldError;
 import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
 import jp.co.sss.lms.entity.AttendanceCheck;
+import jp.co.sss.lms.entity.MPlace;
 import jp.co.sss.lms.entity.TStudentAttendance;
 import jp.co.sss.lms.enums.AttendanceStatusEnum;
 import jp.co.sss.lms.form.AttendanceCheckForm;
@@ -91,10 +94,16 @@ public class StudentAttendanceService {
 	 */
 	public boolean checkAttendanceBlank(Integer lmsUserId) {
 		//未入力数の確認
-		int checked = tStudentAttendanceMapper.notEnterCount(lmsUserId, Constants.DB_FLG_FALSE, new Date());
-		
-		if (checked > 0) {
-			return true;
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+			Date trainingDate = sdf.parse(sdf.format(new Date()));
+			int checked = tStudentAttendanceMapper.notEnterCount(lmsUserId, Constants.DB_FLG_FALSE, trainingDate);
+			
+			if (checked > 0) {
+				return true;
+			}
+		} catch(ParseException e) {
+			e.getStackTrace();
 		}
 		return false;
 	}
@@ -435,6 +444,7 @@ public class StudentAttendanceService {
 	 */
 	public BindingResult punchCheck(AttendanceForm forms, BindingResult result) {
 		int i = 0;
+		List<String> errorList = new ArrayList();
 		for (DailyAttendanceForm form : forms.getAttendanceList()) {
 			//備考欄が100文字以上の場合
 			if (form.getNote().length() > 100) {
@@ -442,13 +452,15 @@ public class StudentAttendanceService {
 				String error = messageUtil.getMessage(Constants.VALID_KEY_MAXLENGTH, str);
 				FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].note", error);
 				result.addError(fieldError);
-			}
+				errorList.add(error);
+				}
 			//出勤時刻の時間、分の分のみが空欄の場合
 			if (form.getTrainingStartTimeHour() != null && form.getTrainingStartTimeMinute() == null) {
 				String[] str = { "出勤時間" };
 				String error = messageUtil.getMessage(Constants.INPUT_INVALID, str);
 				FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].trainingStartTimeMinute", error);
 				result.addError(fieldError);
+				errorList.add(error);
 			}
 			//出勤時刻の時間、分の時間のみが空欄の場合
 			if (form.getTrainingStartTimeMinute() != null && form.getTrainingStartTimeHour() == null) {
@@ -456,6 +468,7 @@ public class StudentAttendanceService {
 				String error = messageUtil.getMessage(Constants.INPUT_INVALID, str);
 				FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].trainingStartTimeHour", error);
 				result.addError(fieldError);
+				errorList.add(error);
 			}
 			//退勤時刻の時間、分の分のみが空欄の場合
 			if (form.getTrainingEndTimeHour() != null && form.getTrainingEndTimeMinute() == null) {
@@ -463,6 +476,7 @@ public class StudentAttendanceService {
 				String error = messageUtil.getMessage(Constants.INPUT_INVALID, str);
 				FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].trainingEndTimeMinute", error);
 				result.addError(fieldError);
+				errorList.add(error);
 			}
 			//退勤時刻の時間、分の時間のみが空欄の場合
 			if (form.getTrainingEndTimeMinute() != null && form.getTrainingEndTimeHour() == null) {
@@ -470,12 +484,14 @@ public class StudentAttendanceService {
 				String error = messageUtil.getMessage(Constants.INPUT_INVALID, str);
 				FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].trainingEndTimeHour", error);
 				result.addError(fieldError);
+				errorList.add(error);
 			}
 			//出勤時刻が未入力で退勤時刻が入力されている場合
 			if (form.getTrainingStartTime() == null && form.getTrainingEndTime() != null) {
 				String error = messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_PUNCHINEMPTY);
 				FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].trainingStartTimeHour", error);
 				result.addError(fieldError);
+				errorList.add(error);
 			}
 			//出勤時間、分と退勤時間、分をString型からInteger型に変更
 			if (form.getTrainingStartTimeHour() != null
@@ -497,11 +513,13 @@ public class StudentAttendanceService {
 						String error = messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_TRAININGTIMERANGE, list);
 						FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].trainingStartTimeHour", error);
 						result.addError(fieldError);
+						errorList.add(error);
 					} else if (startHour == endHour && startMinute > endMinute) {
 						String[] list = { i + "" };
 						String error = messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_TRAININGTIMERANGE, list);
 						FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].trainingStartTimeHour", error);
 						result.addError(fieldError);
+						errorList.add(error);
 					}
 				}
 				//中抜け時間が勤務時間よりも長い場合
@@ -514,11 +532,14 @@ public class StudentAttendanceService {
 					String error = messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_BLANKTIMEERROR);
 					FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].blankTime", error);
 					result.addError(fieldError);
+					errorList.add(error);
 				}
 			
 			}
 			i++;
 		}
+		List<String> fixedErrorList = new ArrayList<>(new HashSet<>(errorList));
+		forms.setErrorList(fixedErrorList);
 		return result;
 	}
 	
@@ -556,4 +577,16 @@ public class StudentAttendanceService {
 			
 		return check;
 	}
+	
+	/**
+	 * 会場の名前を設定
+	 * @return 会場(教室名)
+	 */
+	public String setPlaceName(MPlace place) {
+		String placeNote = place.getPlaceNote();
+		String placeNameNote = place.getPlaceName() + "(" +
+				placeNote.substring((placeNote.indexOf("$") + 1), placeNote.lastIndexOf("$")) + ")";
+		
+		return placeNameNote;
+		}
 }
