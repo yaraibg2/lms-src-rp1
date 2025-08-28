@@ -444,7 +444,7 @@ public class StudentAttendanceService {
 	 */
 	public BindingResult punchCheck(AttendanceForm forms, BindingResult result) {
 		int i = 0;
-		List<String> errorList = new ArrayList();
+		List<String> errorList = new ArrayList<>();
 		for (DailyAttendanceForm form : forms.getAttendanceList()) {
 			//備考欄が100文字以上の場合
 			if (form.getNote().length() > 100) {
@@ -489,7 +489,7 @@ public class StudentAttendanceService {
 			//出勤時刻が未入力で退勤時刻が入力されている場合
 			if (form.getTrainingStartTime() == null && form.getTrainingEndTime() != null) {
 				String error = messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_PUNCHINEMPTY);
-				FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].trainingStartTimeHour", error);
+				FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "]", error);
 				result.addError(fieldError);
 				errorList.add(error);
 			}
