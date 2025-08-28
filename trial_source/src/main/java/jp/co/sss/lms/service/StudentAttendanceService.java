@@ -17,13 +17,16 @@ import org.springframework.validation.FieldError;
 
 import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
+import jp.co.sss.lms.dto.UserAttendanceDto;
 import jp.co.sss.lms.entity.AttendanceCheck;
 import jp.co.sss.lms.entity.MPlace;
 import jp.co.sss.lms.entity.TStudentAttendance;
 import jp.co.sss.lms.enums.AttendanceStatusEnum;
 import jp.co.sss.lms.form.AttendanceCheckForm;
 import jp.co.sss.lms.form.AttendanceForm;
+import jp.co.sss.lms.form.BulkRegistForm;
 import jp.co.sss.lms.form.DailyAttendanceForm;
+import jp.co.sss.lms.mapper.MPlaceMapper;
 import jp.co.sss.lms.mapper.TStudentAttendanceMapper;
 import jp.co.sss.lms.util.AttendanceUtil;
 import jp.co.sss.lms.util.Constants;
@@ -55,6 +58,8 @@ public class StudentAttendanceService {
 	private TStudentAttendanceMapper tStudentAttendanceMapper;
 	@Autowired
 	private MessageSource messageSource;
+	@Autowired
+	private MPlaceMapper mPlaceMapper;
 
 	/**
 	 * 勤怠一覧情報取得
@@ -444,6 +449,7 @@ public class StudentAttendanceService {
 	 */
 	public BindingResult punchCheck(AttendanceForm forms, BindingResult result) {
 		int i = 0;
+		//重複を消すためリストを作成
 		List<String> errorList = new ArrayList<>();
 		for (DailyAttendanceForm form : forms.getAttendanceList()) {
 			//備考欄が100文字以上の場合
@@ -511,13 +517,13 @@ public class StudentAttendanceService {
 					if (startHour > endHour) {
 						String[] list = { i + "" };
 						String error = messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_TRAININGTIMERANGE, list);
-						FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].trainingStartTimeHour", error);
+						FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].trainingEndTimeHour", error);
 						result.addError(fieldError);
 						errorList.add(error);
 					} else if (startHour == endHour && startMinute > endMinute) {
 						String[] list = { i + "" };
 						String error = messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_TRAININGTIMERANGE, list);
-						FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].trainingStartTimeHour", error);
+						FieldError fieldError = new FieldError(result.getObjectName(), "attendanceList[" + i + "].trainingEndTimeHour", error);
 						result.addError(fieldError);
 						errorList.add(error);
 					}
@@ -538,6 +544,7 @@ public class StudentAttendanceService {
 			}
 			i++;
 		}
+		//重複を消す
 		List<String> fixedErrorList = new ArrayList<>(new HashSet<>(errorList));
 		forms.setErrorList(fixedErrorList);
 		return result;
@@ -588,5 +595,45 @@ public class StudentAttendanceService {
 				placeNote.substring((placeNote.indexOf("$") + 1), placeNote.lastIndexOf("$")) + ")";
 		
 		return placeNameNote;
+	}
+	
+	/**
+	 * 日次勤怠の設定
+	 * @param form
+	 * @return 勤怠フォーム
+	 */
+	public BulkRegistForm getBulkAttendanceList(BulkRegistForm form) {
+		List<DailyAttendanceForm> newForms = new ArrayList<>();
+		//勤怠リストを検索
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+			Date fromDate = sdf.parse(form.getSearchPeriodFrom());
+			Date toDate = sdf.parse(form.getSearchPeriodTo());
+			List<UserAttendanceDto> dtos = mPlaceMapper.getUserAttendanceDto(form.getPlaceId(), fromDate, toDate, Constants.DB_FLG_FALSE);
+			//フォームに勤怠情報を移す
+			for (UserAttendanceDto dto : dtos) {
+				DailyAttendanceForm newForm = new DailyAttendanceForm();
+				sdf = new SimpleDateFormat("yyyy年M月d日(E)");
+				newForm.setTrainingDate(sdf.format(dto.getTrainingDate()));
+				newForm.setBlankTime(dto.getBlankTime());
+				newForm.setStatus(String.valueOf(dto.getStatus()));
+				newForms.add(newForm);
+				
+				if (dto.getTrainingStartTime() == null || dto.getTrainingStartTime().equals("")) {
+					newForm.setTrainingStartTime("[未入力]");
+				} else {
+					newForm.setTrainingStartTime(dto.getTrainingStartTime());
+				}
+				if (dto.getTrainingEndTime() == null || dto.getTrainingEndTime().equals("")) {
+					newForm.setTrainingEndTime("[未入力]");
+				} else {
+					newForm.setTrainingEndTime(dto.getTrainingEndTime());
+				}
+			}
+		} catch(ParseException e) {
+			e.getStackTrace();
 		}
+		form.setAttendanceList(newForms);
+		return form;
+	}
 }

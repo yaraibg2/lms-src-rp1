@@ -20,6 +20,7 @@ import jp.co.sss.lms.entity.AttendanceCheck;
 import jp.co.sss.lms.entity.MPlace;
 import jp.co.sss.lms.form.AttendanceCheckForm;
 import jp.co.sss.lms.form.AttendanceForm;
+import jp.co.sss.lms.form.BulkRegistForm;
 import jp.co.sss.lms.mapper.MCompanyMapper;
 import jp.co.sss.lms.mapper.MCourseMapper;
 import jp.co.sss.lms.mapper.MPlaceMapper;
@@ -211,12 +212,46 @@ public class AttendanceController {
 		return "attendance/list";
 	}
 	
+	/**
+	 * 講師権限ヘッダー 『勤怠一括登録』リンク押下
+	 * @param bulkRegistForm
+	 * @param model
+	 * @param session
+	 * @return 勤怠一括登録画面
+	 */
 	@GetMapping("/bulkRegist")
-	public String bulkRegist(Model model, HttpSession session) {
+	public String getBulkRegist(@ModelAttribute BulkRegistForm bulkRegistForm, Model model, HttpSession session) {
+		//ユーザー情報から会場を取得
 		LoginUserDto dto = (LoginUserDto) session.getAttribute("loginUserDto");	
 		MPlace place = mPlaceMapper.findById(dto.getPlaceId(), Constants.DB_HIDDEN_FLG_FALSE,
 				Constants.DB_FLG_FALSE);
+		//会場名の設定
 		String placeName = studentAttendanceService.setPlaceName(place);
+		
+		model.addAttribute("placeName", placeName);
+		return "attendance/bulkRegist";
+	}
+	
+	/**
+	 * 勤怠一括登録画面 検索ボタン押下時
+	 * @param bulkRegistForm
+	 * @param model
+	 * @param session
+	 * @return 勤怠一括登録画面
+	 */
+	@PostMapping("/bulkRegist")
+	public String postBulkRegist(BulkRegistForm bulkRegistForm, Model model, HttpSession session) {
+		//ユーザー情報から会場を取得
+		LoginUserDto dto = (LoginUserDto) session.getAttribute("loginUserDto");	
+		MPlace place = mPlaceMapper.findById(dto.getPlaceId(), Constants.DB_HIDDEN_FLG_FALSE,
+				Constants.DB_FLG_FALSE);
+		//会場名の設定
+		String placeName = studentAttendanceService.setPlaceName(place);
+		//勤怠リストの取得
+		bulkRegistForm.setPlaceId(place.getPlaceId());
+		bulkRegistForm = studentAttendanceService.getBulkAttendanceList(bulkRegistForm);
+		
+		model.addAttribute("bulkRegistForm", bulkRegistForm);
 		model.addAttribute("placeName", placeName);
 		return "attendance/bulkRegist";
 	}

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	th:replace="~{/common/layout :: layout(~{::title},~{::body/content()})}">
+
+<head>
+	<meta charset="UTF-8">
+	<title>勤怠一括登録 | LMS</title>
+</head>
+
+<body>
+	<div class="container">
+		<div id="contents" class="clearfix">
+			<div id="main" class="main2clm">
+				<h2>勤怠一括登録</h2>
+
+				<form name="attendance_bulkRegist_listActionForm" method="post" th:action="@{/attendance/bulkRegist}"
+					class="form-horizontal">
+					<div class="well bs-component">
+						<fieldset>
+							<legend>検索</legend>
+							<div class="form-group">
+								<label for="placeName" class="col-lg-2 control-label">期間</label>
+								<div class="col-lg-10 form-inline">
+									<input type="text" name="searchPeriodFrom"  id="searchFrom"
+										style="width: 10em" class="form-control datepickerFrom" />　～　
+									<input type="text" name="searchPeriodTo"  id="searchTo"
+										style="width: 10em" class="form-control datepickerTo" />
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label for="placeName" class="col-lg-2 control-label">会場名</label>
+								<div class="col-lg-10">
+									<input type="text" class="form-control" name="placeName" th:value="${placeName}"disabled />
+								</div>
+							</div>
+
+							<div class="form-group">
+								<div class="col-lg-10 col-lg-offset-2">
+									<input type="submit" method="post" th:action="@{/attendance/bulkRegist}" name="search" value="検索" class="btn btn-primary" />
+								</div>
+							</div>
+						</fieldset>
+					</div>
+
+					<table class="table">
+						<tbody>
+							<tr style="
+                      background-color: #f5f5f5;
+                      border-top-style: solid;
+                      border-width: medium;">
+								<th colspan="7">未実装</th>
+								<th colspan="2">
+									<button id="copyAttendanceDaily" type="button" value="0" class="btn btn-default">
+										受講生が入力した時刻をコピーする
+									</button>
+								</th>
+								<td>
+									<button id="submit-btn" type="submit" name="complete" value="0"
+										class="btn btn-info">
+										確定する
+									</button>
+									<input type="hidden" name="targetIndex" value="" id="targetIndex" />
+								</td>
+							</tr>
+							<tr>
+								<th style="width: 120px">ユーザー名</th>
+								<th style="width: 190px">コース名</th>
+								<th style="width: 90px">出勤</th>
+								<th style="width: 90px">退勤</th>
+								<th style="width: 90px">中抜け時間</th>
+								<th style="width: 90px">ステータス</th>
+								<th style="width: 50px">備考</th>
+								<th style="width: 90px">開始時間</th>
+								<th style="width: 90px">終了時間</th>
+								<th style="width: 50px">欠席</th>
+							</tr>
+
+							<tr>
+								<td>未実装</td>
+								<td>未実装</td>
+								<td>未実装</td>
+								<td>未実装</td>
+								<td>未実装</td>
+								<td>未実装</td>
+								<td><strong data-toggle="popover" data-placement="right" data-content="社用のため欠勤"
+										data-trigger="hover" data-original-title="" title="">未実装</strong></td>
+								<input type="hidden" name="dailyAttendanceFormList[0].lmsUserId" value="24463" />
+								<input type="hidden" name="dailyAttendanceFormList[0].userName" value="デモ受講生" />
+								<input type="hidden" name="dailyAttendanceFormList[0].courseName"
+									value="【削除不可】体験型Java研修用【デモ】" />
+								<input type="hidden" name="dailyAttendanceFormList[0].dispTrainingDate"
+									value="2021年2月1日(月)" />
+								<input type="hidden" name="dailyAttendanceFormList[0].trainingDate"
+									value="2021-02-01" />
+								<input type="hidden" name="dailyAttendanceFormList[0].index" value="0" />
+								<input type="hidden" name="dailyAttendanceFormList[0].trainingStartTimeRaw"
+									value="[未入力]" />
+								<input type="hidden" name="dailyAttendanceFormList[0].trainingEndTimeRaw"
+									value="[未入力]" />
+								<input type="hidden" name="dailyAttendanceFormList[0].blankTimeValue" value="" />
+								<input type="hidden" name="dailyAttendanceFormList[0].statusDispName" value="" />
+								<input type="hidden" name="dailyAttendanceFormList[0].note" value="" />
+								<input type="hidden" name="dailyAttendanceFormList[0].trainingStartTimeRounded" value=""
+									class="startTimeCompanyRounded0" />
+								<input type="hidden" name="dailyAttendanceFormList[0].trainingEndTimeRounded" value=""
+									class="endTimeCompanyRounded0" />
+								<td>
+									<input type="text" name="dailyAttendanceFormList[0].trainingStartTime" value=""
+										id="trainingStartTime" class="form-control startTimeCompany0" />
+								</td>
+								<td>
+									<input type="text" name="dailyAttendanceFormList[0].trainingEndTime" value=""
+										id="trainingEndTime" class="form-control endTimeCompany0" />
+								</td>
+								<td>
+									<input type="checkbox" name="dailyAttendanceFormList[0].isAbsent" value="on"
+										class="attendanceFormControl" />
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+		</div>
+		<form id="screenTransForm" name="screenTransForm" method="post"></form>
+		<div id="push"></div>
+	</div>
+	</div>
+</body>
+
+</html>
